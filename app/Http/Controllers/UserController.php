@@ -9,15 +9,47 @@ use Illuminate\Validation\Rule;
 class UserController extends Controller
 {
     //
-
+    private const MIN_PASSWORD_LENGTH = 4;
+    private const MIN_USERNAME_LENGTH = 3;
+    private const MAX_USERNAME_LENGTH = 20;
     public function register(Request $request) {
         $incomingFields = $request->validate([
-            'username' =>  ['required', 'min:3', 'max:20', Rule::unique('users', 'username')],
+            'username' =>  ['required', 'min:'.self::MIN_USERNAME_LENGTH, 'max:'.self::MAX_USERNAME_LENGTH, Rule::unique('users', 'username')],
             'email' => ['required', 'email', Rule::unique('users', 'email')],
-            'password' => ['required', 'min:4', 'confirmed'] // 4 for testing purposes
+            'password' => ['required', 'min:'.self::MIN_PASSWORD_LENGTH, 'confirmed'] // 4 for testing purposes
         ]);
         //password hashing is done in user Model.
-        User::create($incomingFields);
-        return "Hi";
+        $newlyCreatedUser = User::create($incomingFields);
+        auth()->login($newlyCreatedUser);
+        return redirect('/')->with('success', 'Welcome, enjoy your stay!');
+    }
+
+    public function showCorrectHomepage()  {
+        $isLoggedIn = auth()->check();
+        if($isLoggedIn) {
+            return view("homepage-feed");
+        }
+        else {
+            return view("homepage");
+        }
+    }
+
+    public function login(Request $request) {
+            $incomingFields = $request->validate([
+                'loginusername' =>  'required',
+                'loginpassword' => 'required'
+            ]);
+            $username = $incomingFields['loginusername'];
+            $password = $incomingFields['loginpassword']; //is this already hashed? it's not a user model, so normally it shouldn't be => but apperantly our auth function does this for us?
+           
+            if(auth()->attempt(['username' => $username, 'password' => $password])) {
+                $request->session()->regenerate();   
+                return redirect('/')->with('success', 'Successfully logged in!');            
+            }
+            return redirect('/')->with('failure', 'Invalid login credentials'); //Correct homepage will be shown
+    }
+    public function logout() {
+        auth()->logout();
+        return redirect('/')->with('success', 'Successfully logged out!');   ;
     }
 }
