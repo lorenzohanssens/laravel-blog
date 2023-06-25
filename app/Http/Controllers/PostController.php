@@ -10,6 +10,7 @@ class PostController extends Controller
 {
     //
     public function showCreateForm() {
+        //could check if user has auth, if so return redirect to homepage but that's not the way to go about it. middleware.
         return view("create-post");
     }
     public function storeNewPost(Request $request) {
