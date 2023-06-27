@@ -14,6 +14,11 @@ use App\Http\Controllers\UserController;
 |
 */
 
+Route::get('/admins-only', function() {
+    return response("Hey!");
+})->middleware('can:visitAdminPages');
+
+
 // User related routes
 Route::get('/', [UserController::class, "showCorrectHomepage"])->name('login');
 Route::post('/register', [UserController::class, "register"])->middleware('guest');
