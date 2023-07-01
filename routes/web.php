@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\FollowController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -27,7 +28,9 @@ Route::post('/logout', [UserController::class, "logout"])->middleware('mustBeLog
 Route::get('/manage-avatar', [UserController::class, "showAvatarForm"])->middleware('mustBeLoggedIn');
 Route::post('/manage-avatar', [UserController::class, "storeAvatar"])->middleware('mustBeLoggedIn');;
 
-
+//follow related routes
+Route::post('/create-follow/{user:username}', [FollowController::class, "createFollow"])->middleware('mustBeLoggedIn');
+Route::post('/remove-follow/{user:username}', [FollowController::class, "removeFollow"])->middleware('mustBeLoggedIn');
 // Blog post related routes
 Route::get('/create-post', [PostController::class, "showCreateForm"])->middleware('mustBeLoggedIn');
 Route::post('/create-post', [PostController::class, "storeNewPost"])->middleware('mustBeLoggedIn');
@@ -38,3 +41,4 @@ Route::put('/post/{post}', [PostController::class, "updatePost"])->middleware("c
 
 //profile related routes
 Route::get('/profile/{user:username}', [UserController::class, "profile"]); //7:17 ep 30
+
