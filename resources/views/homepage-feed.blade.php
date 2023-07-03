@@ -8,6 +8,10 @@
         <strong>{{$post['title']}} </strong><span class="text-muted small"> by {{$post->user->username}} on {{$post->created_at->format('j/n/Y')}}</span>
       </a>
     @endforeach
+    
+    <div class="mt-4">
+      {{$feed->links()}}
+      </div>
       @else
       <div class="text-center">
         <h2>Hello <strong>{{auth()->user()->username}}</strong>, your feed is empty.</h2>
