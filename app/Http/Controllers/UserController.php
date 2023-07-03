@@ -64,24 +64,24 @@ class UserController extends Controller
         {
             $isFollowing = Follow::where([['user_id', '=', auth()->user()->id], ['followeduser', '=', $user->id]])->count();
         }
-        View::share('sharedData',  ['username' => $user->username,  'avatar' => $user->avatar, 'isFollowing' => $isFollowing, 'posts' => $user->posts()->latest()->get()]);
+        View::share('sharedData',  ['username' => $user->username,  'avatar' => $user->avatar, 'isFollowing' => $isFollowing, 'postCount' => $user->posts()->count(), 'followerCount' => $user->followers->count(), 'followingCount' => $user->isFollowing->count()]);
     }
 
     public function profile(User $user) {
      
         $this->getSharedProfileData($user);
      
-        return view('profile-posts');
+        return view('profile-posts', ['posts' => $user->posts()->latest()->get()]);
     }
 
     public function profileFollowers(User $user) {
  
         $this->getSharedProfileData($user);
-        return view('profile-followers');
+        return view('profile-followers', ['followers' => $user->followers()->latest()->get()]);
     }
     public function profileFollowing(User $user) {
         $this->getSharedProfileData($user);
-        return view('profile-following');
+        return view('profile-following', ['following' => $user->isFollowing()->latest()->get()]);
     }
 
 
@@ -104,6 +104,7 @@ class UserController extends Controller
    
         $user->avatar = $imgName;
         $user->save();
+        
         return back()->with('success', 'You look nice!');
     }
 }
