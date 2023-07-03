@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Follow;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\View;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 
@@ -55,16 +56,35 @@ class UserController extends Controller
         auth()->logout();
         return redirect('/')->with('success', 'Successfully logged out!');   ;
     }
-    public function profile(User $user) {
-        $userPosts = $user->posts()->latest()->get();
+
+    private function getSharedProfileData($user) {
+        //TODO: better way of passing posts only for the ones that actually need it...
         $isFollowing = 0;
         if(auth()->check())
         {
             $isFollowing = Follow::where([['user_id', '=', auth()->user()->id], ['followeduser', '=', $user->id]])->count();
         }
-     
-        return view('profile-posts', ['username' => $user->username, 'posts' => $userPosts, 'avatar' => $user->avatar, 'isFollowing' => $isFollowing]);
+        View::share('sharedData',  ['username' => $user->username,  'avatar' => $user->avatar, 'isFollowing' => $isFollowing, 'posts' => $user->posts()->latest()->get()]);
     }
+
+    public function profile(User $user) {
+     
+        $this->getSharedProfileData($user);
+     
+        return view('profile-posts');
+    }
+
+    public function profileFollowers(User $user) {
+ 
+        $this->getSharedProfileData($user);
+        return view('profile-followers');
+    }
+    public function profileFollowing(User $user) {
+        $this->getSharedProfileData($user);
+        return view('profile-following');
+    }
+
+
     public function showAvatarForm() {
         return view('avatar-form');
     }
