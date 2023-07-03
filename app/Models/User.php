@@ -100,4 +100,8 @@ class User extends Authenticatable
     public function isFollowing() {
         return $this->hasMany(Follow::class, 'user_id');
     }
+
+    public function feedPosts() {
+        return $this->hasManyThrough(Post::class, Follow::class, 'user_id', 'user_id', 'id', 'followeduser'); //TODO: look at this more profoundly: Want to get posts through the follows by FK ,
+    }
 }
